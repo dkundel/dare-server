@@ -4,7 +4,7 @@ var _ = require('underscore');
 // Tester function extravaganza
 exports.test = function (req, res, next) {
 	var param = req.params;
-	exports.addDare(param.username, 2);
+	exports.acceptDare(param.username, 4);
 }
 
 // Create a new user, based on Fb auth data (tested)
@@ -21,7 +21,8 @@ exports.create = function (req, res, next) {
   	email: data.email,
   	username: data.username,
   	score: 0
-  	//dares: [] -> empty arrays won't get written to Firebase
+  	//my_dares: [] -> empty arrays won't get written to Firebase
+  	//dared : [] -> same as above
   });
 
   res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
@@ -37,7 +38,6 @@ exports.get = function(req, res, next) {
 	exports.getInfo(param.username, function(data) { 
 		res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
 
-		console.log(data);
 		if (data) {
   			res.end(JSON.stringify(data));
   		}
@@ -63,24 +63,95 @@ exports.getInfo = function(username, callback) {
 // Internal function to alter score of the user (by adding score value) (tested)
 exports.addScore = function(username, score) {
 
-	var userscore = db.child("users").child(username).child("score");
-
-	userscore.once('value',function(data) {
-		userscore.set(data.val() + score);
+	exports.getInfo(username, function(data) {
+		if (data) {
+			var userscore = db.child("users").child(username).child("score");
+			userscore.set(data.score + score);
+		}
+		else {
+			console.log("Username " + username + " was not found!");
+		}
 	});
 }
 
 // Internal function to add a new dare to users' array of dares (tested)
 exports.addDare = function(username, dareid) {
 
-	var dares = db.child("users").child(username).child("dares");
-	
-	dares.once('value', function(data) {
-		if (!data.val()) {
-			dares.set([dareid]);
+	exports.getInfo(username, function(data) {
+		if (data) {
+			var dares = db.child("users").child(username).child("my_dares");
+
+			if (!data.my_dares) {
+				dares.set([dareid]);
+			}
+			else {
+				dares.set(_.union(data.my_dares,[dareid]));
+			}
 		}
 		else {
-			dares.set(_.union(data.val(),[dareid]));
+			console.log("Username " + username + " was not found!");
 		}
-	});
+	});	
+}
+
+// Internal function to add a new dare, sent to the user (tested)
+exports.gotDared = function(username, dareid) {
+
+	exports.getInfo(username, function(data) {
+		if (data) {
+			var dares = db.child("users").child(username).child("dared");
+
+			if (!data.dared) {
+				dares.set([{dareid: dareid, pending: true, done: false}]);
+			}
+			else {
+				dares.set(_.union(data.dared,[{dareid: dareid, pending: true, done: false}]));
+			}
+		}
+		else {
+			console.log("Username " + username + " was not found!");
+		}
+	});	
+}
+
+// Internal function to reject a dare request and delete it from the list (tested)
+exports.deleteDare = function(username, dareid) {
+
+	exports.getInfo(username, function(data) {
+		if (data) {
+			var dares = db.child("users").child(username).child("dared");
+
+			if (data.dared) {
+				dares.set(_.reject(data.dared,function(elem) { return elem.dareid == dareid}));
+			}
+		}
+		else {
+			console.log("Username " + username + " was not found!");
+		}
+	});	
+}
+
+// Internal function to accept a dare request (not pending anymore) (tested)
+exports.acceptDare = function(username, dareid) {
+
+	exports.getInfo(username, function(data) {
+		if (data) {
+			var dares = db.child("users").child(username).child("dared");
+
+			if (data.dared) {
+				var temp = data.dared;
+
+				_.each(temp,function(elem) { 
+					if (elem.dareid == dareid) {
+						elem.pending = false; // accepted challenge
+					}
+				});
+
+				dares.set(temp);
+			}
+		}
+		else {
+			console.log("Username " + username + " was not found!");
+		}
+	});	
 }
