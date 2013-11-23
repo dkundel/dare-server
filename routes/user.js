@@ -5,7 +5,7 @@ var _ = require('underscore');
 exports.create = function (req, res, next) {
   
   var data = req.params;
-  var new_user = db.child("users").child(data.username);
+  var new_user = db.child("users").child(data.screen_name);
 
   new_user.set({
   	id: data.id, 
@@ -15,10 +15,11 @@ exports.create = function (req, res, next) {
   	score: 0
   	//my_dares: [] -> empty arrays won't get written to Firebase
   	//dared : [] -> same as above
+  	//starred: [] -> got it until now, i hope :D
   });
 
   res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
-  res.end(JSON.stringify(new_user));
+  res.end(JSON.stringify({status: "success"}));
   return next();
 }
 
@@ -88,6 +89,7 @@ exports.addDare = function(username, dareid, callback) {
 	});	
 }
 
+
 // Internal function to add a new dare, sent to the user (tested)
 exports.gotDared = function(username, dareid, callback) {
 
@@ -100,25 +102,6 @@ exports.gotDared = function(username, dareid, callback) {
 			}
 			else {
 				dares.set(_.union(data.dared,[{dareid: dareid, pending: true, done: false}]));
-			}
-
-			callback({status: "success"});
-		}
-		else {
-			callback({status: "error", error: 404, text:"requested user doesn't exist"})
-		}
-	});	
-}
-
-// Internal function to reject a dare request and delete it from the list (tested)
-exports.deleteDare = function(username, dareid,callback) {
-
-	exports.getInfo(username, function(data) {
-		if (data) {
-			var dares = db.child("users").child(username).child("dared");
-
-			if (data.dared) {
-				dares.set(_.reject(data.dared,function(elem) { return elem.dareid == dareid}));
 			}
 
 			callback({status: "success"});
@@ -155,3 +138,60 @@ exports.acceptDare = function(username, dareid, callback) {
 		}
 	});	
 }
+
+
+// Internal function to reject a dare request and delete it from the list (tested)
+exports.deleteDare = function(username, dareid,callback) {
+
+	exports.getInfo(username, function(data) {
+		if (data) {
+			var dares = db.child("users").child(username).child("dared");
+
+			if (data.dared) {
+				dares.set(_.reject(data.dared,function(elem) { return elem.dareid == dareid}));
+			}
+
+			callback({status: "success"});
+		}
+		else {
+			callback({status: "error", error: 404, text:"requested user doesn't exist"})
+		}
+	});	
+}
+
+// Internal function to add a new starred dare (tested)
+exports.addStarred = function(username, dareid, callback) {
+
+	exports.getInfo(username, function(data) {
+		if (data) {
+			var dares = db.child("users").child(username).child("starred");
+
+			if (!data.starred) {
+				dares.set([dareid]);
+			}
+			else {
+				dares.set(_.union(data.starred,[dareid]));
+			}
+
+			callback({status: "success"});
+		}
+		else {
+			callback({status: "error", error: 404, text:"requested user doesn't exist"})
+		}
+	});	
+}
+
+// Request to star a dare (tested)
+exports.star = function(req, res, next) {
+
+	var username = req.params.username;
+	var dareid = req.params.dareid;
+
+	exports.addStarred(username, dareid, function(data){
+		res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+    	res.end(JSON.stringify(data));
+    	return next();
+	});
+}
+
+// exports.removeStarred should've been here
