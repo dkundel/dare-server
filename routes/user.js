@@ -5,7 +5,7 @@ var _ = require('underscore');
 exports.create = function (req, res, next) {
   
   var data = req.params;
-  var new_user = db.child("users").child(data.username);
+  var new_user = db.child("users").child(data.screen_name);
 
   new_user.set({
   	id: data.id, 
@@ -18,7 +18,7 @@ exports.create = function (req, res, next) {
   });
 
   res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
-  res.end(JSON.stringify(new_user));
+  res.end(JSON.stringify({status: "success"}));
   return next();
 }
 
