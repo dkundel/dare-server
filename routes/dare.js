@@ -9,12 +9,15 @@ exports.create = function (req, res, next) {
     dare.target = "";
   }
 
+  var timestamp = new Date();
+
   var newdare = db.child("dares").push({
     creator: dare.creator,
     name: dare.name,
-    descrition: dare.description,
+    description: dare.description,
     target: dare.target,
-    status: "pending"
+    status: "pending",
+    timestamp: timestamp.getTime()
   });
 
   var dare_id = newdare.path.m[1];
@@ -27,7 +30,7 @@ exports.create = function (req, res, next) {
   }
 
   res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
-  res.end(JSON.stringify(dare));
+  res.end(JSON.stringify(newdare));
   return next();
 }
 
