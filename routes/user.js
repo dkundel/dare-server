@@ -16,6 +16,7 @@ exports.create = function (req, res, next) {
   	//my_dares: [] -> empty arrays won't get written to Firebase
   	//dared : [] -> same as above
   	//starred: [] -> got it until now, i hope :D
+  	//accomplished: [] -> how many arrays do you freaking have?!
   });
 
   res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
