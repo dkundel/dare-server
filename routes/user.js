@@ -8,19 +8,17 @@ exports.create = function (req, res, next) {
   var new_user = db.child("users").child(data.username);
 
   new_user.set({
-  	fb_id: data.fb_id, 
-  	fname: data.fname,
-  	lname: data.lname,
-  	imageurl: data.imageurl,
-  	email: data.email,
-  	username: data.username,
+  	id: data.id, 
+  	name: data.name,
+  	imageurl: data.profile_image_url,
+  	username: data.screen_name,
   	score: 0
   	//my_dares: [] -> empty arrays won't get written to Firebase
   	//dared : [] -> same as above
   });
 
   res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
-  res.end(JSON.stringify(data));
+  res.end(JSON.stringify(new_user));
   return next();
 }
 
