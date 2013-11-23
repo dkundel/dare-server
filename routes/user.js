@@ -213,4 +213,34 @@ exports.star = function(req, res, next) {
 	});
 }
 
-// exports.removeStarred should've been here
+// Internal function to remove a challenge from starred (tested)
+exports.removeStarred = function(username, dareid,callback) {
+
+	exports.getInfo(username, function(data) {
+		if (data) {
+			var dares = db.child("users").child(username).child("starred");
+
+			if (data.starred) {
+				dares.set(_.reject(data.starred,function(elem) { return elem == dareid}));
+			}
+
+			callback({status: "success"});
+		}
+		else {
+			callback({status: "error", error: 404, text:"requested user doesn't exist"})
+		}
+	});	
+}
+
+// Request to unstar a dare (tested)
+exports.unstar = function(req, res, next) {
+
+	var username = req.params.username;
+	var dareid = req.params.dareid;
+
+	exports.removeStarred(username, dareid, function(data){
+		res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+    	res.end(JSON.stringify(data));
+    	return next();
+	});
+}

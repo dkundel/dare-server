@@ -26,6 +26,7 @@ server.use(restify.bodyParser());
 server.get('/user/:username', user.get);
 server.post('/user/create', user.create);
 server.post('/user/star', user.star);
+server.post('/user/unstar', user.unstar);
 
 // Dares
 server.post('/dare/create', dare.create);
