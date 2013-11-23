@@ -2,9 +2,9 @@ var restify = require('restify');
 var packageInfo = require('./package.json');
 var config = require('./config.json');
 
-// var user = require('./routes/user');
+var user = require('./routes/user');
 var dare = require('./routes/dare');
-// var feed = require('./routes/feed');
+var feed = require('./routes/feed');
 
 // WATCHOUT GLOBAL STUFF!
 firebase = require('firebase');
@@ -19,6 +19,10 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
+// Users
+server.get('/user/create', user.create);
+
+// Dares
 server.get('/dare/accept/:id', dare.accept);
 
 server.get('/dbtest', function  (req, res, next) {
