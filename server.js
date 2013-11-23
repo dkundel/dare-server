@@ -19,15 +19,13 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
-server.get(/\/test\/?.*/, restify.serveStatic({
-  directory: './public'
-}));
-
 // Users
-server.get('/user/create', user.create);
+server.post('/user/create', user.create);
 
 // Dares
-server.get('/dare/accept/:id', dare.accept);
+server.post('/dare/create', dare.create);
+server.get('/dare/:id', dare.get);
+server.post('/dare/accept/:id', dare.accept);
 
 server.get('/dbtest', function  (req, res, next) {
 	/*db.child('users').child('vlad').set({name: "Vlad", age: 12});
@@ -35,6 +33,10 @@ server.get('/dbtest', function  (req, res, next) {
   		console.log(snapshot.val());
 	});*/
 });
+
+server.get(/\/test\/?.*/, restify.serveStatic({
+  directory: './public'
+}));
 
 server.listen(config.port, function () {
   console.log('%s listening at %s', server.name, server.url);
