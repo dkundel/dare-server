@@ -13,10 +13,6 @@ exports.create = function (req, res, next) {
     dare.promoted = false;
   }
 
-  if (!dare.image) {
-    dare.image = "";
-  }
-
   var timestamp = new Date();
 
   var newdare = db.child("dares").push({
