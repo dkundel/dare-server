@@ -2,6 +2,14 @@ var restify = require('restify');
 var packageInfo = require('./package.json');
 var config = require('./config.json');
 
+// var user = require('./routes/user');
+var dare = require('./routes/dare');
+// var feed = require('./routes/feed');
+
+// WATCHOUT GLOBAL STUFF!
+firebase = require('firebase');
+db = new firebase(config.firebaseUrl);
+
 var server = restify.createServer({
   name: packageInfo.name,
   version: packageInfo.version
@@ -11,13 +19,7 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
-var firebase = require('firebase');
-var db = new firebase(config.firebaseUrl);
-
-server.get('/echo/:name', function (req, res, next) {
-  res.send(req.params);
-  return next();
-});
+server.get('/dare/accept/:id', dare.accept);
 
 server.get('/dbtest', function  (req, res, next) {
 	/*db.child('users').child('vlad').set({name: "Vlad", age: 12});
