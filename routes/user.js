@@ -12,7 +12,7 @@ exports.create = function (req, res, next) {
   	name: data.name,
   	imageurl: data.profile_image_url,
   	username: data.screen_name,
-  	score: 0
+  	score: 0,
   	//my_dares: [] -> empty arrays won't get written to Firebase
   	//dared : [] -> same as above
   	//starred: [] -> got it until now, i hope :D
@@ -50,6 +50,25 @@ exports.getInfo = function(username, callback) {
 
 	user.once('value', function(data) {
   		callback(data.val());
+	});
+}
+
+// Send notification to a user
+exports.sendNotification = function(username, title, msg, action) {
+
+	var notification = {
+	  channels: [username],
+	  data: {
+	  	title: title,
+	    alert: msg,
+	    action: action
+	  }
+	};
+
+	parseapp.sendPush(notification, function(err, resp){
+		if (err) {
+			console.log("Push notification failed with error: " + err);
+		}
 	});
 }
 
