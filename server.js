@@ -19,8 +19,11 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
+
 // Users
+server.get('/user/test/:username',user.test);
 server.post('/user/create', user.create);
+server.get('/user/:username', user.get);
 
 // Dares
 server.post('/dare/create', dare.create);
