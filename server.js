@@ -19,7 +19,11 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
-server.get('/dare/accept/:id', dare.accept);
+server.get(/\/test\/?.*/, restify.serveStatic({
+  directory: './public'
+}));
+
+server.post('/dare/accept/:id', dare.accept);
 
 server.get('/dbtest', function  (req, res, next) {
 	/*db.child('users').child('vlad').set({name: "Vlad", age: 12});
