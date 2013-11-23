@@ -1,12 +1,6 @@
 // (to enable advanced array functions (_.))
 var _ = require('underscore');
 
-// Tester function extravaganza
-exports.test = function (req, res, next) {
-	var param = req.params;
-	exports.acceptDare(param.username, 4);
-}
-
 // Create a new user, based on Fb auth data (tested)
 exports.create = function (req, res, next) {
   
@@ -75,7 +69,7 @@ exports.addScore = function(username, score) {
 }
 
 // Internal function to add a new dare to users' array of dares (tested)
-exports.addDare = function(username, dareid) {
+exports.addDare = function(username, dareid, callback) {
 
 	exports.getInfo(username, function(data) {
 		if (data) {
@@ -87,15 +81,17 @@ exports.addDare = function(username, dareid) {
 			else {
 				dares.set(_.union(data.my_dares,[dareid]));
 			}
+
+			callback({status: "success"});
 		}
 		else {
-			console.log("Username " + username + " was not found!");
+			callback({status: "error", error: 404, text:"requested user doesn't exist"})
 		}
 	});	
 }
 
 // Internal function to add a new dare, sent to the user (tested)
-exports.gotDared = function(username, dareid) {
+exports.gotDared = function(username, dareid, callback) {
 
 	exports.getInfo(username, function(data) {
 		if (data) {
@@ -107,15 +103,17 @@ exports.gotDared = function(username, dareid) {
 			else {
 				dares.set(_.union(data.dared,[{dareid: dareid, pending: true, done: false}]));
 			}
+
+			callback({status: "success"});
 		}
 		else {
-			console.log("Username " + username + " was not found!");
+			callback({status: "error", error: 404, text:"requested user doesn't exist"})
 		}
 	});	
 }
 
 // Internal function to reject a dare request and delete it from the list (tested)
-exports.deleteDare = function(username, dareid) {
+exports.deleteDare = function(username, dareid,callback) {
 
 	exports.getInfo(username, function(data) {
 		if (data) {
@@ -124,15 +122,17 @@ exports.deleteDare = function(username, dareid) {
 			if (data.dared) {
 				dares.set(_.reject(data.dared,function(elem) { return elem.dareid == dareid}));
 			}
+
+			callback({status: "success"});
 		}
 		else {
-			console.log("Username " + username + " was not found!");
+			callback({status: "error", error: 404, text:"requested user doesn't exist"})
 		}
 	});	
 }
 
 // Internal function to accept a dare request (not pending anymore) (tested)
-exports.acceptDare = function(username, dareid) {
+exports.acceptDare = function(username, dareid, callback) {
 
 	exports.getInfo(username, function(data) {
 		if (data) {
@@ -149,9 +149,11 @@ exports.acceptDare = function(username, dareid) {
 
 				dares.set(temp);
 			}
+
+			callback({status: "success"});
 		}
 		else {
-			console.log("Username " + username + " was not found!");
+			callback({status: "error", error: 404, text:"requested user doesn't exist"})
 		}
 	});	
 }

@@ -21,13 +21,14 @@ server.use(restify.bodyParser());
 
 
 // Users
-server.get('/user/test/:username',user.test);
-server.post('/user/create', user.create);
 server.get('/user/:username', user.get);
+server.post('/user/create', user.create);
 
 // Dares
 server.post('/dare/create', dare.create);
 server.get('/dare/:id', dare.get);
+server.post('/dare/accept',dare.accept);
+server.post('/dare/reject',dare.reject);
 
 server.get(/\/test\/?.*/, restify.serveStatic({
   directory: './public'
