@@ -9,6 +9,10 @@ exports.create = function (req, res, next) {
     dare.target = "";
   }
 
+  if (!dare.image) {
+    dare.image = "";
+  }
+
   var timestamp = new Date();
 
   var newdare = db.child("dares").push({
@@ -16,6 +20,7 @@ exports.create = function (req, res, next) {
     name: dare.name,
     description: dare.description,
     target: dare.target,
+    image: dare.image,
     status: "pending",
     timestamp: timestamp.getTime()
   });
