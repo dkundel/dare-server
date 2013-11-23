@@ -24,7 +24,7 @@ server.get(/\/test\/?.*/, restify.serveStatic({
 }));
 
 // Users
-server.get('/user/create', user.create);
+server.post('/user/create', user.create);
 
 // Dares
 server.get('/dare/accept/:id', dare.accept);
