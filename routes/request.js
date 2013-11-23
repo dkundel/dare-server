@@ -1,12 +1,22 @@
 var user = require('./user');
 var _ = require('underscore');
 
-exports.notifyCreator = function(dare_id, creator, hero) {
+exports.notifyCreator = function(creator, hero) {
 
+  var hero_name = db.child("users").child(hero).child("name");
+
+  hero_name.once('value', function(data) {
+     user.sendNotification(hero,"Dare accomplished!",data.val() + " claimed to complete your dare. Click to check the validity.","com.code4fun.dare.FIN_DARE");
+  });
 }
 
-exports.notifyUser = function(dare_id, hero, creator) {
+exports.notifyUser = function(creator, hero, dareid) {
 
+  var creator_name = db.child("users").child(creator).child("name");
+
+  creator_name.once('value', function(data) {
+     user.sendNotification(creator,"Congratulations!",data.val() + " has confirmed, that you successfully finished his dare! You received 5 experience points :)","com.code4fun.dare.DARE_SCORE");
+  });
 }
 
 exports.done = function (req, res, next) {
@@ -32,7 +42,7 @@ exports.done = function (req, res, next) {
       requestRef.set(data);
 
       // send push notification
-      exports.notifyCreator(newRequest.dare_id, newRequest.creator, newRequest.hero);
+      exports.notifyCreator(newRequest.creator,newRequest.hero);
 
       res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
       res.end(JSON.stringify(newRequest));
@@ -42,7 +52,7 @@ exports.done = function (req, res, next) {
 }
 
 exports.confirm = function (req, res, next) {
-  var dare_id = req.params.dare;
+  var dare_id = req.params.dareid;
   var hero = req.params.hero;
   var creator = req.params.creator;
 
@@ -53,7 +63,7 @@ exports.confirm = function (req, res, next) {
     var confirmedDare;
 
     data = _.reject(data, function(request) {
-      if (request.dare == dare_id && request.hero == hero && request.creator == creator){
+      if (request.dare == dare_id && request.hero == hero && request.creator == creator) {
         confirmedDare = request;
         return true;
       }
@@ -62,8 +72,26 @@ exports.confirm = function (req, res, next) {
 
     requestRef.set(data);
 
-    user.addScore(hero, 50);
-    exports.notifyUser(dare_id, hero, creator);
+    user.addScore(hero, 5);
+
+     // Add to accomplished
+    user.getInfo(hero, function(param) {
+      if (param) {
+        var dares = db.child("users").child(hero).child("accomplished");
+
+        if (!param.accomplished) {
+          dares.set([dare_id]);
+        }
+        else {
+          dares.set(_.union(param.accomplished,[dare_id]));
+        }
+      }
+      else {
+        console.log("Can't add to accomplished! Username " + hero + " doesn't exist.");
+      }
+    }); 
+
+    exports.notifyUser(creator,hero,dare_id);
 
     res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
     res.end(JSON.stringify(confirmedDare));

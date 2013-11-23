@@ -12,10 +12,11 @@ exports.create = function (req, res, next) {
   	name: data.name,
   	imageurl: data.profile_image_url,
   	username: data.screen_name,
-  	score: 0
+  	score: 0,
   	//my_dares: [] -> empty arrays won't get written to Firebase
   	//dared : [] -> same as above
   	//starred: [] -> got it until now, i hope :D
+  	//accomplished: [] -> how many arrays do you freaking have?!
   });
 
   res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
@@ -50,6 +51,25 @@ exports.getInfo = function(username, callback) {
 
 	user.once('value', function(data) {
   		callback(data.val());
+	});
+}
+
+// Send notification to a user
+exports.sendNotification = function(username, title, msg, action) {
+
+	var notification = {
+	  channels: [username],
+	  data: {
+	  	title: title,
+	    alert: msg,
+	    action: action
+	  }
+	};
+
+	parseapp.sendPush(notification, function(err, resp){
+		if (err) {
+			console.log("Push notification failed with error: " + err);
+		}
 	});
 }
 
@@ -194,4 +214,34 @@ exports.star = function(req, res, next) {
 	});
 }
 
-// exports.removeStarred should've been here
+// Internal function to remove a challenge from starred (tested)
+exports.removeStarred = function(username, dareid,callback) {
+
+	exports.getInfo(username, function(data) {
+		if (data) {
+			var dares = db.child("users").child(username).child("starred");
+
+			if (data.starred) {
+				dares.set(_.reject(data.starred,function(elem) { return elem == dareid}));
+			}
+
+			callback({status: "success"});
+		}
+		else {
+			callback({status: "error", error: 404, text:"requested user doesn't exist"})
+		}
+	});	
+}
+
+// Request to unstar a dare (tested)
+exports.unstar = function(req, res, next) {
+
+	var username = req.params.username;
+	var dareid = req.params.dareid;
+
+	exports.removeStarred(username, dareid, function(data){
+		res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+    	res.end(JSON.stringify(data));
+    	return next();
+	});
+}

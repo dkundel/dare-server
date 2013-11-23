@@ -32,11 +32,18 @@ exports.create = function (req, res, next) {
 
   if (dare.target && dare.target !== "") {
     // TODO: Check if target exists!!!
+    
     user.gotDared(dare.target, dare_id);
+
+    var creator_name = db.child("users").child(dare.creator).child("name");
+
+    creator_name.once('value', function(data) {
+       user.sendNotification(dare.target,"Whooooooa!","Seems like " + data.val() + " dared you to do something. I'd defend my honor if I were you...","com.code4fun.dare.GET_DARE");
+    });
   }
 
-  //res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
-  res.send(newdare);
+  res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+  res.end(JSON.stringify({status: "success"}));
   return next();
 }
 
@@ -94,16 +101,3 @@ exports.reject = function (req, res, next) {
     return next();
   });
 }
-
-/*
-// Claim that you completed dare
-exports.claim = function (req, res, next) {
-  var dare_id = req.params.id;
-  var username = req.params.username;
-
-  exports.getInfo(dare_id, function(data) {
-    var creator = data.creator;
-    //request.create(dare_id, creator, username);
-  });
-}
-*/

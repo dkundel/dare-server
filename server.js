@@ -1,4 +1,5 @@
 var restify = require('restify');
+var Parse = require('node-parse-api').Parse;
 var packageInfo = require('./package.json');
 var config = require('./config.json');
 
@@ -10,6 +11,7 @@ var request = require('./routes/request');
 // WATCHOUT GLOBAL STUFF!
 firebase = require('firebase');
 db = new firebase(config.firebaseUrl);
+parseapp = new Parse(config.parseAppId, config.parseMasterKey);
 
 var server = restify.createServer({
   name: packageInfo.name,
@@ -20,11 +22,11 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
-
 // Users
 server.get('/user/:username', user.get);
 server.post('/user/create', user.create);
 server.post('/user/star', user.star);
+server.post('/user/unstar', user.unstar);
 
 // Dares
 server.post('/dare/create', dare.create);
