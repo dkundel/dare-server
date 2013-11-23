@@ -42,6 +42,9 @@ server.post('/request/confirm', request.confirm);
 server.get(/\/test\/?.*/, restify.serveStatic({
   directory: './public'
 }));
+server.get(/\/images\/?.*/, restify.serveStatic({
+  directory: './public'
+}));
 
 server.listen(config.port, function () {
   console.log('%s listening at %s', server.name, server.url);
