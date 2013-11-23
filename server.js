@@ -31,6 +31,7 @@ server.post('/dare/accept',dare.accept);
 server.post('/dare/reject',dare.reject);
 
 server.get('/feed/latest', feed.latest);
+server.get('/feed/promoted', feed.promoted);
 
 server.get(/\/test\/?.*/, restify.serveStatic({
   directory: './public'

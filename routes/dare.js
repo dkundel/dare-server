@@ -9,6 +9,10 @@ exports.create = function (req, res, next) {
     dare.target = "";
   }
 
+  if (!dare.promoted) {
+    dare.promoted = false;
+  }
+
   if (!dare.image) {
     dare.image = "";
   }
@@ -22,6 +26,7 @@ exports.create = function (req, res, next) {
     target: dare.target,
     image: dare.image,
     status: "pending",
+    promoted: dare.promoted,
     timestamp: timestamp.getTime()
   });
 
@@ -34,8 +39,8 @@ exports.create = function (req, res, next) {
     user.gotDared(dare.target, dare_id);
   }
 
-  res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
-  res.end(JSON.stringify(newdare));
+  //res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+  res.send(newdare);
   return next();
 }
 
