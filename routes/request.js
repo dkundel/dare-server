@@ -53,7 +53,7 @@ exports.confirm = function (req, res, next) {
     var confirmedDare;
 
     data = _.reject(data, function(request) {
-      if (request.dare == dare_id && request.hero == hero && request.creator == creator)
+      if (request.dare == dare_id && request.hero == hero && request.creator == creator){
         confirmedDare = request;
         return true;
       }

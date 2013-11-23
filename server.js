@@ -5,7 +5,7 @@ var config = require('./config.json');
 var user = require('./routes/user');
 var dare = require('./routes/dare');
 var feed = require('./routes/feed');
-var request = require('/routes/request');
+var request = require('./routes/request');
 
 // WATCHOUT GLOBAL STUFF!
 firebase = require('firebase');
@@ -34,6 +34,7 @@ server.post('/dare/reject',dare.reject);
 
 server.get('/feed/latest', feed.latest);
 server.get('/feed/promoted', feed.promoted);
+server.get('/feed/inbox/:username', feed.inbox);
 
 server.post('/request/done', request.done);
 server.post('/request/confirm', request.confirm);
