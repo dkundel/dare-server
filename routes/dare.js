@@ -2,14 +2,26 @@ var user = require('./user');
 
 // Create a new dare (tested)
 exports.create = function (req, res, next) {
+
   var dare = req.params;
 
-  var newDareRef = db.child("dares").push(dare);
-  var dare_id = newDareRef.path.m[1];
+  if (!dare.target) {
+    dare.target = "";
+  }
+
+  var newdare = db.child("dares").push({
+    creator: dare.creator,
+    name: dare.name,
+    descrition: dare.description,
+    target: dare.target,
+    status: "pending"
+  });
+
+  var dare_id = newdare.path.m[1];
 
   user.addDare(dare.creator, dare_id, function(){});
 
-  if (dare.target) {
+  if (dare.target && dare.target !== "") {
     // TODO: Check if target exists!!!
     user.gotDared(dare.target, dare_id);
   }
@@ -36,6 +48,15 @@ exports.get = function(req, res, next) {
   });
 }
 
+// Set status of the dare (tested)
+exports.setStatus = function(dare_id, status) {
+  var dareRef = db.child("dares").child(dare_id);
+  dareRef.once('value', function(data) {
+    var val = data.val();
+    val.status = status;
+    dareRef.set(val);
+  });
+}
 
 // Accept a dare (tested)
 exports.accept = function (req, res, next) {
@@ -43,6 +64,7 @@ exports.accept = function (req, res, next) {
   var dare_id = req.params.dareid;
   var username = req.params.username;
 
+  exports.setStatus(dare_id, "accepted");
   user.acceptDare(username, dare_id, function(data) {
     res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
     res.end(JSON.stringify(data));
@@ -56,6 +78,7 @@ exports.reject = function (req, res, next) {
   var dare_id = req.params.dareid;
   var username = req.params.username;
 
+  exports.setStatus(dare_id, "rejected");
   user.deleteDare(username, dare_id, function(data) {
     res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
     res.end(JSON.stringify(data));
