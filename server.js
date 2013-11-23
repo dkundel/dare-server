@@ -30,12 +30,6 @@ server.post('/dare/create', dare.create);
 server.get('/dare/:id', dare.get);
 server.post('/dare/accept/:id', dare.accept);
 
-server.get('/dbtest', function  (req, res, next) {
-	/*db.child('users').child('vlad').set({name: "Vlad", age: 12});
-	db.child('users').on('value', function(snapshot) {
-  		console.log(snapshot.val());
-	});*/
-});
 
 server.get(/\/test\/?.*/, restify.serveStatic({
   directory: './public'

@@ -1,30 +1,31 @@
-
 var user = require('./user');
 
+// Tester function extravaganza
+exports.test = function (req, res, next) {
+  var param = req.params;
+  exports.accept(param.username, 4);
+}
+
+// Create a new dare (tested)
 exports.create = function (req, res, next) {
-  var dare = req.params.dare;
-
-  var target = null;
-
-  if (typeof dare.target !== 'undefined') {
-    target =  dare.target;
-    delete dare.target;
-  }
+  var dare = req.params;
 
   var newDareRef = db.child("dares").push(dare);
-  
   var dare_id = newDareRef.path.m[1];
 
-  user.addDare(req.params.dare.creator, dare_id);
+  user.addDare(dare.creator, dare_id);
 
-  if (target !== null) {
-    user.gotDared(target, dare_id);
+  if (dare.target) {
+    // TODO: Check if target exists!!!
+    user.gotDared(dare.target, dare_id);
   }
 
-  res.send({id: dare_id});
+  res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+  res.end(JSON.stringify(dare));
   return next();
 }
 
+// Internal get information (tested)
 exports.getInfo = function(dare_id, callback) {
   var dareRef = db.child("dares").child(dare_id);
   dareRef.once('value', function(data) {
@@ -32,6 +33,7 @@ exports.getInfo = function(dare_id, callback) {
   });
 }
 
+// Request to get information (tested)
 exports.get = function(req, res, next) {
   exports.getInfo(req.params.id, function(data) {
     res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
@@ -40,7 +42,9 @@ exports.get = function(req, res, next) {
   });
 }
 
-// echos
+// Redundant?
+/*
+// Accept a dare
 exports.accept = function (req, res, next) {
   var dare_id = req.params.id;
   var username = req.params.username;
@@ -51,6 +55,7 @@ exports.accept = function (req, res, next) {
   return next();
 }
 
+// Reject a dare
 exports.reject = function (req, res, next) {
   var dare_id = req.params.id;
   var username = req.params.username;
@@ -61,6 +66,7 @@ exports.reject = function (req, res, next) {
   return next();
 }
 
+// Claim that you completed dare
 exports.claim = function (req, res, next) {
   var dare_id = req.params.id;
   var username = req.params.username;
@@ -70,3 +76,4 @@ exports.claim = function (req, res, next) {
     //request.create(dare_id, creator, username);
   });
 }
+*/

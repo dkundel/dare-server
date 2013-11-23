@@ -1,4 +1,4 @@
-// (to enable union() function)
+// (to enable advanced array functions (_.))
 var _ = require('underscore');
 
 // Tester function extravaganza
