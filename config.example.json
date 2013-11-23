@@ -1,0 +1,5 @@
+{
+  "firebaseUrl": "https://dareapp.firebaseio.com/",
+  "firebaseToken": "FILL IN",
+  "port": 6969
+}
