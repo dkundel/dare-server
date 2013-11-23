@@ -28,8 +28,6 @@ server.get('/user/:username', user.get);
 // Dares
 server.post('/dare/create', dare.create);
 server.get('/dare/:id', dare.get);
-server.post('/dare/accept/:id', dare.accept);
-
 
 server.get(/\/test\/?.*/, restify.serveStatic({
   directory: './public'
