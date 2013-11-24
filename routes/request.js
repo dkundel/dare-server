@@ -37,7 +37,7 @@ exports.done = function (req, res, next) {
       if (!data) {
         data = [];
       }
-      
+
       var newRequest = {
         hero: username,
         dare: dare_id,
@@ -45,6 +45,8 @@ exports.done = function (req, res, next) {
       };
       data.push(newRequest);
       requestRef.set(data);
+
+      user.addScore(username, 5);
 
       // send push notification
       exports.notifyCreator(newRequest.creator,newRequest.hero);
