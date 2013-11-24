@@ -9,6 +9,7 @@
     "firebase": "*",
     "restify": "*",
     "underscore": "*",
-    "node-parse-api": "*"
+    "node-parse-api": "*",
+    "gm": "*"
   }
 }

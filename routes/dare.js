@@ -1,4 +1,5 @@
 var user = require('./user');
+var gm = require('gm');
 
 // Create a new dare (tested)
 exports.create = function (req, res, next) {
@@ -18,7 +19,21 @@ exports.create = function (req, res, next) {
     var data = dare.base64img.replace(/^data:image\/png;base64,/,"");
     var timestamp = (new Date()).getTime().toString();
 
-    require('fs').writeFileSync(__dirname+'/../public/images/'+timestamp+'.png', data, 'base64');
+    var path = __dirname+'/../public/images/'+timestamp+'.png';
+    require('fs').writeFileSync(path, data, 'base64');
+    gm(path).size(function (err, size) {
+      if(!err) {
+        var MAX_WIDTH = 1024.0;
+        var MAX_HEIGHT = 768.0;
+        var ratio = Math.min(1.0, Math.min(size.width/MAX_WIDTH, size.height/MAX_HEIGHT));
+        var newWidth = size.width*ratio;
+        var newHeight = size.height*ratio;
+
+        gm(path).resize(newWidth, newHeight).write(path, function(err2){
+          console.log(err2);
+        });
+      }
+    });
 
     dare.image = '/images/'+timestamp+'.png';
     delete dare.base64img;
