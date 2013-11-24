@@ -144,10 +144,9 @@ exports.acceptDare = function(username, dareid, callback) {
 			var dares = db.child("users").child(username).child("dared");
 
 			if (data.dared) {
-
 				_.each(data.dared,function(elem) { 
 					if (elem.dareid == dareid) {
-						elem.pending = false; // accepted challenge
+						delete elem;
 					}
 				});
 
@@ -158,9 +157,17 @@ exports.acceptDare = function(username, dareid, callback) {
 				}];
 
 				temp = _.union(data.dared,temp);
-
 				dares.set(temp);
 			}
+			else {
+				dares.set([{dareid: dareid,pending: false,done: false}]);
+			}
+
+			var dareRef = db.child("dares").child(dareid);
+			dareRef.once('value', function(param) {
+				param = param.val();
+				exports.sendNotification(param.creator,"Booyah!",data.name + " has accepted your challenge! >:D","com.code4fun.dare.ACC_DARE");
+			});			
 
 			callback({status: "success"});
 		}
