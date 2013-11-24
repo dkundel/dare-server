@@ -144,6 +144,12 @@ exports.starred = function (req, res, next) {
         var dare = dares[d];
         dare.id = d;
         dare.starred = true;
+        var accepted = _.map(data.dared, function(value) {
+            if (value.dareid == dare.id && value.pending == false) {
+              return value.dareid;
+            }
+          });
+        dare.accepted = (accepted.length != 0);
         return dare;
       });
 
