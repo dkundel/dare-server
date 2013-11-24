@@ -13,6 +13,21 @@ exports.create = function (req, res, next) {
     dare.promoted = false;
   }
 
+  if (!dare.base64img) {
+    dare.image = "/images/default.png";
+  }
+  else {
+    var data = dare.base64img.replace(/^data:image\/png;base64,/,"");
+
+    var timestamp = (new Date()).getTime().toString();
+
+    require('fs').writeFileSync(__dirname+'/../public/images/'+timestamp+'.png', data, 'base64');
+
+    dare.image = '/images/'+timestamp+'.png';
+
+    delete dare.base64img;
+  }
+
   var timestamp = new Date();
 
   var newdare = db.child("dares").push({
