@@ -43,6 +43,7 @@ exports.done = function (req, res, next) {
 
       // send push notification
       exports.notifyCreator(newRequest.creator,newRequest.hero);
+      exports.notifyUser(newRequest.creator,newRequest.hero,newRequest.dare);
 
       res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
       res.end(JSON.stringify(newRequest));
