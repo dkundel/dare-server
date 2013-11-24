@@ -144,13 +144,20 @@ exports.acceptDare = function(username, dareid, callback) {
 			var dares = db.child("users").child(username).child("dared");
 
 			if (data.dared) {
-				var temp = data.dared;
 
-				_.each(temp,function(elem) { 
+				_.each(data.dared,function(elem) { 
 					if (elem.dareid == dareid) {
 						elem.pending = false; // accepted challenge
 					}
 				});
+
+				var temp = [{
+					dareid: dareid,
+					pending: false,
+					done: false
+				}];
+
+				temp = _.union(data.dared,temp);
 
 				dares.set(temp);
 			}
