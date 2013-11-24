@@ -33,6 +33,11 @@ exports.done = function (req, res, next) {
 
     requestRef.once('value', function(data){
       data = data.val();
+
+      if (!data) {
+        data = [];
+      }
+      
       var newRequest = {
         hero: username,
         dare: dare_id,
