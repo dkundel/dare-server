@@ -8,28 +8,23 @@ exports.create = function (req, res, next) {
   if (!dare.target) {
     dare.target = "";
   }
-
   if (!dare.promoted) {
     dare.promoted = false;
   }
-
   if (!dare.base64img) {
     dare.image = "/images/default.png";
   }
   else {
     var data = dare.base64img.replace(/^data:image\/png;base64,/,"");
-
     var timestamp = (new Date()).getTime().toString();
 
     require('fs').writeFileSync(__dirname+'/../public/images/'+timestamp+'.png', data, 'base64');
 
     dare.image = '/images/'+timestamp+'.png';
-
     delete dare.base64img;
   }
 
   var timestamp = new Date();
-
   var newdare = db.child("dares").push({
     creator: dare.creator,
     name: dare.name,
@@ -38,20 +33,17 @@ exports.create = function (req, res, next) {
     image: dare.image,
     status: "pending",
     promoted: dare.promoted,
-    timestamp: timestamp.getTime()
+    timestamp: timestamp.getTime().toString()
   });
 
   var dare_id = newdare.path.m[1];
-
   user.addDare(dare.creator, dare_id, function(){});
 
   if (dare.target && dare.target !== "") {
-    // TODO: Check if target exists!!!
     
-    user.gotDared(dare.target, dare_id);
+    user.gotDared(dare.target, dare_id, function(){});
 
     var creator_name = db.child("users").child(dare.creator).child("name");
-
     creator_name.once('value', function(data) {
        user.sendNotification(dare.target,"Whooooooa!","Seems like " + data.val() + " dared you to do something. I'd defend my honor if I were you...","com.code4fun.dare.GET_DARE");
     });

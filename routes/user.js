@@ -7,21 +7,25 @@ exports.create = function (req, res, next) {
   var data = req.params;
   var new_user = db.child("users").child(data.screen_name);
 
-  new_user.set({
-  	id: data.id, 
-  	name: data.name,
-  	imageurl: data.profile_image_url,
-  	username: data.screen_name,
-  	score: 0,
-  	//my_dares: [] -> empty arrays won't get written to Firebase
-  	//dared : [] -> same as above
-  	//starred: [] -> got it until now, i hope :D
-  	//accomplished: [] -> how many arrays do you freaking have?!
-  });
+  new_user.once('value',function(param){
+  	if (!param.val()) {
+  		new_user.set({
+		  	id: data.id, 
+		  	name: data.name,
+		  	imageurl: data.profile_image_url,
+		  	username: data.screen_name,
+		  	score: 0
+		  	//my_dares: [] -> empty arrays won't get written to Firebase
+		  	//dared : [] -> same as above
+		  	//starred: [] -> got it until now, i hope :D
+		  	//accomplished: [] -> how many arrays do you freaking have?!
+		});
+  	}
 
-  res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
-  res.end(JSON.stringify({status: "success"}));
-  return next();
+  	res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+  	res.end(JSON.stringify({status: "success"}));
+  	return next();
+  });
 }
 
 // Request a data about user (tested)
