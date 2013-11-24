@@ -41,6 +41,12 @@ exports.latestPersonalized = function (req, res, next) {
       if (data) {
         array = _.map(array, function(dare){
           dare.starred = _.contains(data.starred, dare.id);
+          var accepted = _.map(data.dared, function(value) {
+            if (value.dareid == dare.id && value.pending == false) {
+              return value.dareid;
+            }
+          });
+          dare.accepted = (accepted.length != 0);
           return dare;
         });
         res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
