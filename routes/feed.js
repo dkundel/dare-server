@@ -15,7 +15,7 @@ exports.latest = function (req, res, next) {
     var array = exports.toArray(data.val());
 
     array = _.sortBy(array, function(data) {
-      return (-1)*(new Date(data.timestamp)).getTime();
+      return -1*data.timestamp;
     });
 
     res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
