@@ -24,6 +24,34 @@ exports.latest = function (req, res, next) {
   });
 }
 
+exports.latestPersonalized = function (req, res, next) {
+  var username = req.params.username;
+  var daresRef = db.child("dares");
+
+  daresRef.once('value', function(data) {
+    var array = exports.toArray(data.val());
+
+    array = _.sortBy(array, function(data) {
+      return -1*data.timestamp;
+    });
+
+    var userRef = db.child("users").child(username);
+    userRef.once('value', function(data) {
+      data = data.val();
+      if (data) {
+        array = _.map(array, function(dare){
+          dare.starred = _.contains(data.starred, dare.id);
+          return dare;
+        });
+        res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+        res.end(JSON.stringify(array));
+        return next(); 
+      }
+    });
+    
+  });
+}
+
 exports.promoted = function (req, res, next) {
   var daresRef = db.child("dares");
   daresRef.once('value', function(data){

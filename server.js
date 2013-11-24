@@ -35,6 +35,7 @@ server.post('/dare/accept',dare.accept);
 server.post('/dare/reject',dare.reject);
 
 server.get('/feed/latest', feed.latest);
+server.get('/feed/latest/:username', feed.latestPersonalized);
 server.get('/feed/promoted', feed.promoted);
 server.get('/feed/inbox/:username', feed.inbox);
 server.get('/feed/starred/:username', feed.starred);
