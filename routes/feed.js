@@ -137,6 +137,7 @@ exports.starred = function (req, res, next) {
       var response = _.map(data.starred, function(d) {
         var dare = dares[d];
         dare.id = d;
+        dare.starred = true;
         return dare;
       });
 
