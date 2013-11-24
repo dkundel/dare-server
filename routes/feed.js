@@ -85,3 +85,36 @@ exports.inbox = function (req, res, next) {
     });
   });
 }
+
+exports.starred = function (req, res, next) {
+  var username = req.params.username;
+
+  var userRef = db.child("users").child(username);
+
+  userRef.once('value', function(data){
+    data = data.val();
+
+    if (!data) {
+      res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+      var error = {error: 404, text: "requested user doesn't exist"};
+      res.end(JSON.stringify(error));
+      return next();
+    }
+
+    var daresRef = db.child("dares");
+
+    daresRef.once('value', function(dares) {
+      dares = dares.val();
+
+      var response = _.map(data.starred, function(d) {
+        var dare = dares[d];
+        dare.id = d;
+        return dare;
+      });
+
+      res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+      res.end(JSON.stringify(response));
+      return next();
+    });
+  });
+}
