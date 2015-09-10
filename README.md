@@ -1,4 +1,4 @@
 dare-server
 ===========
 
-Dare.
+Client for Android: [https://github.com/ungureanuvladvictor/dare-android]()
